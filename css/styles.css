@@ -704,6 +704,71 @@ h1 {
   content: "";
 }
 
+.marketplacer-articles {
+  margin: 46px 0 8px;
+  padding: 22px 24px 24px;
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--mint);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, rgba(0, 207, 180, .06), var(--paper) 64%);
+  box-shadow: var(--shadow-sm);
+}
+
+.marketplacer-articles-eyebrow {
+  margin: 0 0 3px;
+  color: var(--mint-dark);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.marketplacer-articles h3 {
+  margin: 0 0 14px;
+  color: var(--ink);
+  font-size: 18px;
+}
+
+.article-link-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.article-link-list li {
+  margin: 0;
+}
+
+.article-link-list a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--ink-soft);
+  background: var(--paper);
+  font-weight: 700;
+  text-decoration: none;
+  transition: border-color .16s ease, background .16s ease, color .16s ease;
+}
+
+.article-link-list a::after {
+  flex: 0 0 auto;
+  color: var(--mint-dark);
+  content: "↗";
+  font-size: 14px;
+}
+
+.article-link-list a:hover {
+  border-color: var(--mint);
+  color: var(--ink);
+  background: rgba(0, 207, 180, .06);
+}
+
 .page-footer {
   margin-top: 58px;
   padding-top: 26px;
