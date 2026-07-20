@@ -26,11 +26,13 @@
     </a>
 
     <div class="topbar-actions">
-      <label class="search-shell" aria-label="Search prototype">
+      <form class="search-shell" id="hub-search-form" role="search" action="index.html" method="get" autocomplete="off">
+        <input type="hidden" name="page" value="search">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
-        <input type="search" placeholder="Search the Hub" disabled>
-        <span class="prototype-label">Prototype</span>
-      </label>
+        <label class="visually-hidden" for="hub-search-input">Search the Operator Onboarding Hub</label>
+        <input id="hub-search-input" type="search" name="q" placeholder="Search the Hub" aria-autocomplete="list" aria-controls="hub-search-suggestions" aria-expanded="false">
+        <div class="search-suggestions" id="hub-search-suggestions" role="listbox" hidden></div>
+      </form>
       <a class="support-link" href="?page=getting-support">Support</a>
     </div>
   </header>
