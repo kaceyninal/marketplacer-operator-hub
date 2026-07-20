@@ -457,18 +457,20 @@ function enhanceRefundFlowPanels(pageId) {
   }
 
   if (pageId === 'refund-financial-adjustments') {
-    const amendmentSection = document.getElementById('understand-invoice-amendments');
+    const amendmentHeading = [...document.querySelectorAll('.content-section h3')]
+      .find(heading => normalizePanelText(heading.textContent) === 'understand invoice amendments');
+    const amendmentSection = amendmentHeading?.closest('.content-section');
+
     if (amendmentSection && !amendmentSection.querySelector('.refund-amendment-tree')) {
       const requiredTerms = ['original seller invoice', 'invoice amendment 1', 'invoice amendment 2'];
       const matchingElements = [...amendmentSection.querySelectorAll('div, article, aside, pre')].filter(element => {
+        if (element.closest('.data-table-wrap, .callout, .refund-amendment-tree')) return false;
         const text = normalizePanelText(element.textContent);
         return requiredTerms.every(term => text.includes(normalizePanelText(term)));
       });
 
-      const amendmentPanel = matchingElements.find(element =>
-        element.parentElement === amendmentSection ||
-        !matchingElements.includes(element.parentElement)
-      ) || matchingElements[0];
+      const amendmentPanel = matchingElements
+        .sort((a, b) => a.textContent.length - b.textContent.length)[0];
 
       if (amendmentPanel) amendmentPanel.outerHTML = buildRefundAmendmentTreeMarkup();
     }
