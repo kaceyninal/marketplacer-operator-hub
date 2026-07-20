@@ -2528,8 +2528,8 @@ h1 {
 
 .service-model-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .service-choice-grid,
-.srm-pillar-grid,
-.service-contact-routes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.srm-pillar-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.service-contact-routes,
 .service-capability-grid,
 .service-signal-grid,
 .service-brief-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -2708,24 +2708,13 @@ h1 {
 
 @media (max-width: 900px) {
   .service-choice-grid,
-  .srm-pillar-grid,
-  .service-contact-routes { grid-template-columns: 1fr; }
+  .srm-pillar-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 760px) {
   .service-model-grid,
+  .service-contact-routes,
   .service-capability-grid,
   .service-signal-grid,
   .service-brief-grid { grid-template-columns: 1fr; }
-}
-
-/* Marketplacer Services: two contact routes after removing the unrelated Support card. */
-.service-contact-routes.two-up {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-@media (max-width: 760px) {
-  .service-contact-routes.two-up {
-    grid-template-columns: 1fr;
-  }
 }
