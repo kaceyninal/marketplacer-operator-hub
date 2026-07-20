@@ -682,9 +682,9 @@ h1 {
 
 .info-card {
   padding: 20px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(34, 24, 58, .13);
   border-radius: var(--radius-md);
-  background: var(--paper);
+  background: linear-gradient(135deg, rgba(0, 207, 180, .075), rgba(255, 255, 255, .96) 62%, var(--paper) 100%);
   box-shadow: var(--shadow-sm);
 }
 
@@ -2484,8 +2484,9 @@ h1 {
 }
 
 .reporting-flow__step--outcome {
-  border-color: rgba(0, 171, 148, .34);
-  background: linear-gradient(135deg, rgba(0, 207, 180, .12), var(--paper) 72%);
+  border-color: rgba(0, 171, 148, .42);
+  background: linear-gradient(135deg, rgba(0, 207, 180, .17), rgba(255, 255, 255, .95) 58%, var(--paper) 100%);
+  box-shadow: 0 8px 22px rgba(0, 171, 148, .08);
 }
 
 @media (max-width: 900px) {
