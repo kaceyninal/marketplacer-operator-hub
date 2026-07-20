@@ -2418,3 +2418,89 @@ h1 {
 @media (max-width: 760px) {
   .contextual-walkthroughs { grid-template-columns: 1fr; }
 }
+
+
+/* Reporting, Performance and Marketplace Operations flow components */
+.reporting-flow {
+  counter-reset: reporting-flow-step;
+  display: grid;
+  gap: 12px;
+  margin: 22px 0 26px;
+  padding: 0;
+  list-style: none;
+}
+
+.reporting-flow--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.reporting-flow--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.reporting-flow__step {
+  counter-increment: reporting-flow-step;
+  position: relative;
+  min-width: 0;
+  min-height: 86px;
+  margin: 0;
+  padding: 17px 18px 17px 58px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
+}
+
+.reporting-flow__step::before {
+  position: absolute;
+  top: 16px;
+  left: 17px;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid rgba(0, 171, 148, .28);
+  border-radius: 50%;
+  color: var(--ink);
+  background: rgba(0, 207, 180, .16);
+  content: counter(reporting-flow-step);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.reporting-flow__step strong {
+  display: block;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.reporting-flow__step span {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.reporting-flow__step--outcome {
+  border-color: rgba(0, 171, 148, .34);
+  background: linear-gradient(135deg, rgba(0, 207, 180, .12), var(--paper) 72%);
+}
+
+@media (max-width: 900px) {
+  .reporting-flow--three {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .reporting-flow--three,
+  .reporting-flow--two {
+    grid-template-columns: 1fr;
+  }
+
+  .reporting-flow__step {
+    min-height: 0;
+  }
+}
