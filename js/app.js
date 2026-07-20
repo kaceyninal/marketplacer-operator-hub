@@ -457,11 +457,21 @@ function enhanceRefundFlowPanels(pageId) {
   }
 
   if (pageId === 'refund-financial-adjustments') {
-    replacePanel(
-      'understand-invoice-amendments',
-      ['original seller invoice', 'invoice amendment 1', 'invoice amendment 2'],
-      buildRefundAmendmentTreeMarkup()
-    );
+    const amendmentSection = document.getElementById('understand-invoice-amendments');
+    if (amendmentSection && !amendmentSection.querySelector('.refund-amendment-tree')) {
+      const requiredTerms = ['original seller invoice', 'invoice amendment 1', 'invoice amendment 2'];
+      const matchingElements = [...amendmentSection.querySelectorAll('div, article, aside, pre')].filter(element => {
+        const text = normalizePanelText(element.textContent);
+        return requiredTerms.every(term => text.includes(normalizePanelText(term)));
+      });
+
+      const amendmentPanel = matchingElements.find(element =>
+        element.parentElement === amendmentSection ||
+        !matchingElements.includes(element.parentElement)
+      ) || matchingElements[0];
+
+      if (amendmentPanel) amendmentPanel.outerHTML = buildRefundAmendmentTreeMarkup();
+    }
 
     replacePanel(
       'reconcile-the-complete-refund',
