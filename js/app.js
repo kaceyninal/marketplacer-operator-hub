@@ -326,6 +326,173 @@ function enhanceMarketplacerArticlePanels() {
   });
 }
 
+function normalizePanelText(value) {
+  return (value || "")
+    .replace(/s+/g, " ")
+    .replace(/[↕↔↓↑]+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function findPlainFlowPanel(sectionId, requiredTerms) {
+  const section = document.getElementById(sectionId);
+  if (!section || section.querySelector('.refund-enhanced')) return null;
+
+  const matches = candidates => candidates.filter(element => {
+    if (!element || !element.textContent) return false;
+    if (["H2", "H3", "H4", "TABLE", "THEAD", "TBODY", "TR", "TH", "TD", "UL", "OL", "LI"].includes(element.tagName)) return false;
+    if (element.closest('.callout, .data-table-wrap, .process-flow, .reporting-flow, .refund-reconcile-flow, .refund-status-flow, .refund-amendment-tree, .marketplacer-articles')) return false;
+    const text = normalizePanelText(element.textContent);
+    return requiredTerms.every(term => text.includes(normalizePanelText(term)));
+  });
+
+  const directCandidates = matches([...section.children].filter(el => el.tagName !== 'H2'));
+  if (directCandidates.length) return directCandidates[0];
+
+  const nestedCandidates = matches([...section.querySelectorAll('div, p, article, aside')]);
+  return nestedCandidates.sort((a, b) => a.textContent.length - b.textContent.length)[0] || null;
+}
+
+function buildReportingFlowMarkup(items, columns = 3, highlightIndices = []) {
+  const columnClass = columns === 2 ? 'reporting-flow--two' : 'reporting-flow--three';
+  return '<div class="reporting-flow ' + columnClass + ' refund-enhanced">' +
+      items.map((item, index) =>
+        '<article class="reporting-flow__step' + (highlightIndices.includes(index) ? ' reporting-flow__step--outcome' : '') + '">' +
+          '<strong>' + item.title + '</strong>' +
+          (item.copy ? '<span>' + item.copy + '</span>' : '') +
+        '</article>'
+      ).join('') +
+    '</div>';
+}
+
+function buildRefundReconcileFlowMarkup(items, highlightLast = true) {
+  return '<div class="refund-reconcile-flow refund-enhanced">' +
+      items.map((item, index) =>
+        '<article class="refund-reconcile-step' + (highlightLast && index === items.length - 1 ? ' refund-reconcile-step--outcome' : '') + '">' +
+          '<span class="refund-reconcile-step__number">' + (index + 1) + '</span>' +
+          '<div class="refund-reconcile-step__copy">' +
+            '<strong>' + item.title + '</strong>' +
+            (item.copy ? '<p>' + item.copy + '</p>' : '') +
+          '</div>' +
+        '</article>'
+      ).join('') +
+    '</div>';
+}
+
+function buildRefundStatusFlowMarkup() {
+  return '<div class="refund-status-flow refund-enhanced">' +
+      '<article class="refund-status-parent">' +
+        '<span class="refund-status-parent__number">1</span>' +
+        '<div><strong>Refund Request</strong><p>Awaiting — the overall request is still in progress.</p></div>' +
+      '</article>' +
+      '<div class="refund-status-children">' +
+        '<article class="refund-status-card"><span class="refund-status-card__label">Line Item A</span><strong>Pending Approval</strong><p>Seller or Operator decision still required.</p></article>' +
+        '<article class="refund-status-card"><span class="refund-status-card__label">Line Item B</span><strong>Awaiting Return</strong><p>The customer still needs to send the item back.</p></article>' +
+        '<article class="refund-status-card"><span class="refund-status-card__label">Line Item C</span><strong>Denied</strong><p>This item has been rejected while the other items continue.</p></article>' +
+      '</div>' +
+    '</div>';
+}
+
+function buildRefundAmendmentTreeMarkup() {
+  return '<div class="refund-amendment-tree refund-enhanced">' +
+      '<article class="refund-amendment-root">' +
+        '<span class="refund-amendment-kicker">Source record</span>' +
+        '<strong>Original Seller Invoice</strong>' +
+        '<p>The original invoice remains intact as the source transaction.</p>' +
+      '</article>' +
+      '<div class="refund-amendment-children">' +
+        '<article class="refund-amendment-node">' +
+          '<span class="refund-amendment-kicker">Invoice Amendment 1</span>' +
+          '<strong>Cancellation of Line Item A</strong>' +
+          '<p>Captures the first financial change against the original invoice.</p>' +
+        '</article>' +
+        '<article class="refund-amendment-node">' +
+          '<span class="refund-amendment-kicker">Invoice Amendment 2</span>' +
+          '<strong>Later return of Line Item B</strong>' +
+          '<p>A later refund event creates its own separate amendment record.</p>' +
+        '</article>' +
+      '</div>' +
+    '</div>';
+}
+
+function replacePanel(sectionId, requiredTerms, html) {
+  const panel = findPlainFlowPanel(sectionId, requiredTerms);
+  if (panel) panel.outerHTML = html;
+}
+
+function enhanceRefundFlowPanels(pageId) {
+  if (pageId === 'return-workflow') {
+    replacePanel(
+      'when-to-use-the-return-workflow',
+      ['post-dispatch refund request', 'returnless refund', 'return required'],
+      buildReportingFlowMarkup([
+        { title: 'Post-dispatch Refund Request', copy: 'Use this workflow once the affected item or quantity has already been dispatched.' },
+        { title: 'Returnless refund', copy: 'Customer keeps or disposes of the item.' },
+        { title: 'Return required', copy: 'Item is returned and assessed.' }
+      ], 3, [1, 2])
+    );
+  }
+
+  if (pageId === 'refund-foundations') {
+    replacePanel(
+      'payment-gateway-responsibilities',
+      ['customer refund amount', 'payment transaction', 'seller remittance'],
+      buildRefundReconcileFlowMarkup([
+        { title: 'Customer refund amount', copy: 'The amount the customer should ultimately receive.' },
+        { title: 'Payment transaction', copy: 'The payment-provider record for the movement of funds.' },
+        { title: 'Storefront Order', copy: 'The customer-facing order record and reference.' },
+        { title: 'Marketplacer Refund Request', copy: 'The workflow record that tracks seller and operator actions.' },
+        { title: 'Invoice Amendment', copy: 'The seller-side financial adjustment created by the refund.' },
+        { title: 'Seller remittance', copy: 'The final payout or recovery effect for the seller.' }
+      ])
+    );
+  }
+
+  if (pageId === 'refund-statuses') {
+    replacePanel(
+      'understand-the-two-status-levels',
+      ['refund request: awaiting', 'line item a', 'line item b', 'line item c'],
+      buildRefundStatusFlowMarkup()
+    );
+  }
+
+  if (pageId === 'refund-financial-adjustments') {
+    replacePanel(
+      'understand-invoice-amendments',
+      ['original seller invoice', 'invoice amendment 1', 'invoice amendment 2'],
+      buildRefundAmendmentTreeMarkup()
+    );
+
+    replacePanel(
+      'reconcile-the-complete-refund',
+      ['customer payment refund', 'invoice amendment and credit notes', 'seller remittance'],
+      buildRefundReconcileFlowMarkup([
+        { title: 'Customer payment refund', copy: 'The actual cash refund sent back to the customer.' },
+        { title: 'Payment gateway transaction', copy: 'The provider transaction and reference for the refund movement.' },
+        { title: 'Storefront Order', copy: 'The customer-facing order that the refund relates to.' },
+        { title: 'Marketplacer Refund Request', copy: 'The workflow and line-item decision record in Marketplacer.' },
+        { title: 'Invoice Amendment and credit notes', copy: 'The marketplace and finance records created to reflect the adjustment.' },
+        { title: 'Seller remittance', copy: 'The revised seller payout or recovery position.' }
+      ])
+    );
+  }
+
+  if (pageId === 'refund-integrations') {
+    replacePanel(
+      'reconcile-the-complete-refund',
+      ['customer case', 'invoice amendment', 'payment gateway refund', 'seller remittance'],
+      buildRefundReconcileFlowMarkup([
+        { title: 'Customer case', copy: 'The originating request in customer service or the returns team.' },
+        { title: 'Storefront or returns platform', copy: 'The customer-facing system where the request is submitted or managed.' },
+        { title: 'Marketplacer Refund Request', copy: 'The operational refund workflow in Marketplacer.' },
+        { title: 'Invoice Amendment', copy: 'The seller-side financial adjustment created by the refund.' },
+        { title: 'Payment gateway refund', copy: 'The payment-provider refund that moves funds back to the customer.' },
+        { title: 'Seller remittance', copy: 'The seller payout or recovery outcome after reconciliation.' }
+      ])
+    );
+  }
+}
+
 function renderPage() {
   const id = currentPageId();
   if (id === "home") {
@@ -383,6 +550,7 @@ function renderPage() {
   `;
 
   enhanceMarketplacerArticlePanels();
+  enhanceRefundFlowPanels(id);
   setupTocObserver();
   scrollToRequestedSection();
 }
